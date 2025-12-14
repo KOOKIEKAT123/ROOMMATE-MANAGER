@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roommate_manager/models/household.dart';
 import 'package:roommate_manager/models/member.dart';
 
 class HouseholdService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Create a household
   Future<String> createHousehold(Household household) async {
@@ -94,6 +96,46 @@ class HouseholdService {
   Future<void> deleteHousehold(String householdId) async {
     try {
       await _firestore.collection('households').doc(householdId).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Check if email is registered
+  Future<bool> isEmailRegistered(String email) async {
+    try {
+      // Check if the email exists in a users collection
+      final result = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email.toLowerCase())
+          .limit(1)
+          .get();
+      return result.docs.isNotEmpty;
+    } catch (e) {
+      // If collection doesn't exist, return false
+      return false;
+    }
+  }
+
+  // Remove member from household
+  Future<void> removeMemberFromHousehold(
+      String householdId, String memberId) async {
+    try {
+      // Remove member document
+      await _firestore
+          .collection('households')
+          .doc(householdId)
+          .collection('members')
+          .doc(memberId)
+          .delete();
+
+      // Remove member ID from household's memberIds array
+      await _firestore
+          .collection('households')
+          .doc(householdId)
+          .update({
+        'memberIds': FieldValue.arrayRemove([memberId])
+      });
     } catch (e) {
       rethrow;
     }

@@ -48,8 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout),
-                onPressed: () {
-                  context.read<AuthService>().signOut();
+                onPressed: () async {
+                  await context.read<AuthService>().signOut();
                 },
               ),
             ],

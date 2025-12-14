@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/household_service.dart';
+import '../../services/auth_service.dart';
 import '../../models/member.dart';
 
 class MembersScreen extends StatefulWidget {
@@ -32,6 +33,16 @@ class _MembersScreenState extends State<MembersScreen> {
       return;
     }
 
+    final email = _emailController.text.trim().toLowerCase();
+
+    // Simple email validation
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid email')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -39,10 +50,27 @@ class _MembersScreenState extends State<MembersScreen> {
     try {
       final householdService = context.read<HouseholdService>();
 
+      // Check if email is registered
+      final isRegistered = await householdService.isEmailRegistered(email);
+      if (!isRegistered) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('This email is not registered in the system'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
       final member = Member(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: _nameController.text,
-        email: _emailController.text,
+        name: _nameController.text.trim(),
+        email: email,
         createdAt: DateTime.now(),
       );
 
@@ -66,6 +94,62 @@ class _MembersScreenState extends State<MembersScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _removeMember(String memberId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Member'),
+        content: const Text('Are you sure you want to remove this member?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final householdService = context.read<HouseholdService>();
+        final authService = context.read<AuthService>();
+        final currentUserId = authService.getCurrentUser()?.uid ?? '';
+
+        // Prevent removing the household creator
+        if (memberId == currentUserId) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Cannot remove yourself as the household creator'),
+              ),
+            );
+          }
+          return;
+        }
+
+        await householdService.removeMemberFromHousehold(
+            widget.householdId, memberId);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Member removed successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -167,10 +251,26 @@ class _MembersScreenState extends State<MembersScreen> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final member = snapshot.data![index];
+                  final authService = context.read<AuthService>();
+                  final currentUserId = authService.getCurrentUser()?.uid ?? '';
+                  final isCreator = member.id == currentUserId;
+
                   return ListTile(
                     leading: const Icon(Icons.person),
                     title: Text(member.name),
                     subtitle: Text(member.email),
+                    trailing: isCreator
+                        ? Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Chip(
+                              label: const Text('Admin'),
+                              backgroundColor: Colors.blue[100],
+                            ),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _removeMember(member.id),
+                          ),
                   );
                 },
               );

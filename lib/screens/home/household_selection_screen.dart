@@ -21,8 +21,8 @@ class HouseholdSelectionScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              authService.signOut();
+            onPressed: () async {
+              await authService.signOut();
             },
           ),
         ],

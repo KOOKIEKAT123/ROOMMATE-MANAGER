@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/household_service.dart';
 import '../../models/household.dart';
+import '../../models/member.dart';
 
 class CreateHouseholdScreen extends StatefulWidget {
   const CreateHouseholdScreen({Key? key}) : super(key: key);
@@ -31,7 +32,9 @@ class _CreateHouseholdScreenState extends State<CreateHouseholdScreen> {
     try {
       final authService = context.read<AuthService>();
       final householdService = context.read<HouseholdService>();
-      final userId = authService.getCurrentUser()?.uid ?? '';
+      final currentUser = authService.getCurrentUser();
+      final userId = currentUser?.uid ?? '';
+      final userEmail = currentUser?.email ?? '';
 
       final household = Household(
         id: '',
@@ -48,7 +51,17 @@ class _CreateHouseholdScreenState extends State<CreateHouseholdScreen> {
         createdAt: DateTime.now(),
       );
 
-      await householdService.createHousehold(household);
+      final householdId = await householdService.createHousehold(household);
+
+      // Auto-add the creator as a member
+      final creatorMember = Member(
+        id: userId,
+        name: userEmail.split('@')[0], // Use email prefix as name initially
+        email: userEmail,
+        createdAt: DateTime.now(),
+      );
+
+      await householdService.addMemberToHousehold(householdId, creatorMember);
 
       if (mounted) {
         Navigator.of(context).pop();

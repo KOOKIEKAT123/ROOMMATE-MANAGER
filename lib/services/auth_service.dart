@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
@@ -11,6 +13,17 @@ class AuthService {
         email: email,
         password: password,
       );
+      
+      // Create user record in Firestore
+      if (result.user != null) {
+        await _firestore.collection('users').doc(result.user!.uid).set({
+          'uid': result.user!.uid,
+          'email': email.toLowerCase(),
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+      
       return result.user;
     } on FirebaseAuthException {
       rethrow;
