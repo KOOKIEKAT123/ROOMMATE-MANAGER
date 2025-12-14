@@ -1,0 +1,235 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/expense_service.dart';
+import '../../services/household_service.dart';
+import '../../models/settlement.dart';
+import '../../models/member.dart';
+
+class SettleUpScreen extends StatefulWidget {
+  final String householdId;
+  final String? selectedMemberId;
+
+  const SettleUpScreen({
+    Key? key,
+    required this.householdId,
+    this.selectedMemberId,
+  }) : super(key: key);
+
+  @override
+  State<SettleUpScreen> createState() => _SettleUpScreenState();
+}
+
+class _SettleUpScreenState extends State<SettleUpScreen> {
+  String? _fromMemberId;
+  String? _toMemberId;
+  final _amountController = TextEditingController();
+  PaymentMethod _paymentMethod = PaymentMethod.cash;
+  final _notesController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fromMemberId = widget.selectedMemberId;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _settleUp() async {
+    if (_fromMemberId == null ||
+        _toMemberId == null ||
+        _amountController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final expenseService = context.read<ExpenseService>();
+
+      final settlement = Settlement(
+        id: '',
+        fromMemberId: _fromMemberId!,
+        toMemberId: _toMemberId!,
+        amount: double.parse(_amountController.text),
+        method: _paymentMethod,
+        notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+        date: DateTime.now(),
+        householdId: widget.householdId,
+      );
+
+      await expenseService.addSettlement(settlement);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Settlement recorded')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final householdService = context.read<HouseholdService>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settle Up'),
+      ),
+      body: StreamBuilder<List<Member>>(
+        stream: householdService.getHouseholdMembers(widget.householdId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final members = snapshot.data ?? [];
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                DropdownButtonFormField<String>(
+                  value: _fromMemberId,
+                  items: members
+                      .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name)))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _fromMemberId = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'From (who pays)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: _toMemberId,
+                  items: members
+                      .where((m) => m.id != _fromMemberId)
+                      .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name)))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _toMemberId = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'To (who receives)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _amountController,
+                  decoration: InputDecoration(
+                    labelText: 'Amount',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    prefixText: '\$ ',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+                const Text('Payment Method'),
+                RadioListTile<PaymentMethod>(
+                  title: const Text('Cash'),
+                  value: PaymentMethod.cash,
+                  groupValue: _paymentMethod,
+                  onChanged: (value) {
+                    setState(() {
+                      _paymentMethod = value ?? PaymentMethod.cash;
+                    });
+                  },
+                ),
+                RadioListTile<PaymentMethod>(
+                  title: const Text('Venmo'),
+                  value: PaymentMethod.venmo,
+                  groupValue: _paymentMethod,
+                  onChanged: (value) {
+                    setState(() {
+                      _paymentMethod = value ?? PaymentMethod.cash;
+                    });
+                  },
+                ),
+                RadioListTile<PaymentMethod>(
+                  title: const Text('PayPal'),
+                  value: PaymentMethod.paypal,
+                  groupValue: _paymentMethod,
+                  onChanged: (value) {
+                    setState(() {
+                      _paymentMethod = value ?? PaymentMethod.cash;
+                    });
+                  },
+                ),
+                RadioListTile<PaymentMethod>(
+                  title: const Text('Bank Transfer'),
+                  value: PaymentMethod.bank_transfer,
+                  groupValue: _paymentMethod,
+                  onChanged: (value) {
+                    setState(() {
+                      _paymentMethod = value ?? PaymentMethod.cash;
+                    });
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _notesController,
+                  decoration: InputDecoration(
+                    labelText: 'Notes (optional)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _settleUp,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Record Settlement'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

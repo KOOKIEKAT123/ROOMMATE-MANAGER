@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "295599434565",
+    "project_id": "device-streaming-40403813",
+    "storage_bucket": "device-streaming-40403813.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295599434565:android:adf90cb59fce15a617ac2c",
+        "android_client_info": {
+          "package_name": "com.example.roommate_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN_eRgwavuwtUvLi6587ztj2rFSOgTiA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
