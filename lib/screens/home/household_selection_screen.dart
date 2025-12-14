@@ -22,7 +22,24 @@ class HouseholdSelectionScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              await authService.signOut();
+              try {
+                await authService.signOut();
+                print('DEBUG: Sign out completed');
+                if (context.mounted) {
+                  print('DEBUG: Context mounted, navigating to root');
+                  // Clear all routes and go back to the root
+                  while (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              } catch (e) {
+                print('DEBUG: Error during sign out: $e');
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Sign out error: $e')),
+                  );
+                }
+              }
             },
           ),
         ],

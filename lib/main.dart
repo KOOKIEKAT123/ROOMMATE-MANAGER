@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
@@ -46,9 +47,9 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
+    final authService = Provider.of<AuthService>(context, listen: false);
     
-    return StreamBuilder(
+    return StreamBuilder<User?>(
       stream: authService.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,10 +58,18 @@ class AuthWrapper extends StatelessWidget {
           );
         }
         
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
+        
+
         if (snapshot.hasData && snapshot.data != null) {
           return const HouseholdSelectionScreen();
         }
         
+
         return const LoginScreen();
       },
     );

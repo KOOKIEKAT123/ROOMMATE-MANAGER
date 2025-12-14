@@ -36,6 +36,10 @@ class _CreateHouseholdScreenState extends State<CreateHouseholdScreen> {
       final userId = currentUser?.uid ?? '';
       final userEmail = currentUser?.email ?? '';
 
+      if (userId.isEmpty || userEmail.isEmpty) {
+        throw 'User information not available';
+      }
+
       final household = Household(
         id: '',
         name: _nameController.text,
@@ -51,25 +55,41 @@ class _CreateHouseholdScreenState extends State<CreateHouseholdScreen> {
         createdAt: DateTime.now(),
       );
 
+      // Create the household and get its ID
       final householdId = await householdService.createHousehold(household);
+      
+      print('DEBUG: Household created with ID: $householdId');
 
-      // Auto-add the creator as a member
+      if (householdId.isEmpty) {
+        throw 'Failed to create household';
+      }
+
+      // Auto-add the creator as a member (with Firebase UID as member ID)
       final creatorMember = Member(
-        id: userId,
-        name: userEmail.split('@')[0], // Use email prefix as name initially
+        id: userId, // Use the Firebase UID
+        name: userEmail.split('@')[0], // Use email prefix as name
         email: userEmail,
         createdAt: DateTime.now(),
       );
 
+      print('DEBUG: Adding creator member with ID: $userId, Email: $userEmail');
+      
+      // Add the creator to the members collection
       await householdService.addMemberToHousehold(householdId, creatorMember);
+      
+      print('DEBUG: Creator member added successfully');
 
       if (mounted) {
         Navigator.of(context).pop();
       }
     } catch (e) {
+      print('DEBUG: Error in _createHousehold: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(
+            content: Text('Error creating household: $e'),
+            duration: const Duration(seconds: 4),
+          ),
         );
       }
     } finally {

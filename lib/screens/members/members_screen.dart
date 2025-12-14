@@ -67,8 +67,25 @@ class _MembersScreenState extends State<MembersScreen> {
         return;
       }
 
+      // Get the user ID for this email
+      final userId = await householdService.getUserIdByEmail(email);
+      if (userId == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not find user ID for this email'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
       final member = Member(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: userId, // Use the actual Firebase UID
         name: _nameController.text.trim(),
         email: email,
         createdAt: DateTime.now(),

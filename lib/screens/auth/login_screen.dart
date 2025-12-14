@@ -74,10 +74,9 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
 
-      // Navigation handled by AuthWrapper in main.dart
+
     } catch (e) {
       setState(() {
-        // Make error messages more user-friendly
         String errorMsg = e.toString();
         if (errorMsg.contains('email-already-in-use')) {
           _errorMessage = 'This email is already registered';

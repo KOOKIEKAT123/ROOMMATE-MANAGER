@@ -49,7 +49,24 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 icon: const Icon(Icons.logout),
                 onPressed: () async {
-                  await context.read<AuthService>().signOut();
+                  try {
+                    await context.read<AuthService>().signOut();
+                    print('DEBUG: Sign out completed from HomeScreen');
+                    if (context.mounted) {
+                      print('DEBUG: Context mounted, clearing navigation stack');
+                      // Clear all routes and go back to the root
+                      while (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  } catch (e) {
+                    print('DEBUG: Error during sign out from HomeScreen: $e');
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Sign out error: $e')),
+                      );
+                    }
+                  }
                 },
               ),
             ],
