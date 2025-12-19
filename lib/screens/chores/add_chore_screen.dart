@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/chore_service.dart';
 import '../../services/household_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/chore.dart';
 import '../../models/member.dart';
 
@@ -40,6 +41,7 @@ class _AddChoreScreenState extends State<AddChoreScreen> {
 
     try {
       final choreService = context.read<ChoreService>();
+      final householdService = context.read<HouseholdService>();
 
       final chore = Chore(
         id: '',
@@ -54,9 +56,28 @@ class _AddChoreScreenState extends State<AddChoreScreen> {
       await choreService.addChore(chore);
 
       if (mounted) {
+        // Get assigned member name
+        final members = await householdService
+            .getHouseholdMembers(widget.householdId)
+            .first;
+        final assignedMember = members.firstWhere(
+          (m) => m.id == _selectedMemberId,
+          orElse: () => members.isNotEmpty ? members.first : members[0],
+        );
+
+        // Show notification
+        NotificationService().showChoreDeadlineNotification(
+          title: '🧹 New Chore Assigned',
+          choreTitle: _titleController.text,
+          assignee: assignedMember.name,
+        );
+
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Chore added successfully')),
+          const SnackBar(
+            content: Text('Chore added successfully'),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } catch (e) {

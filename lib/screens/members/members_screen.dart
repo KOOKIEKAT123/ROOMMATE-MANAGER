@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/household_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/member.dart';
 
 class MembersScreen extends StatefulWidget {
@@ -97,8 +98,16 @@ class _MembersScreenState extends State<MembersScreen> {
       _emailController.clear();
 
       if (mounted) {
+        // Show notification
+        NotificationService().showMemberJoinedNotification(
+          memberName: member.name,
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Member added successfully')),
+          const SnackBar(
+            content: Text('Member added successfully'),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } catch (e) {
@@ -174,127 +183,240 @@ class _MembersScreenState extends State<MembersScreen> {
   Widget build(BuildContext context) {
     final householdService = context.read<HouseholdService>();
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Member Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+    return Scaffold(
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Add New Member',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Member Name',
+                    prefixIcon: const Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: _isLoading ? null : _addMember,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Add Member', style: TextStyle(fontSize: 16)),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: const Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _addMember,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation(
+                                  Theme.of(context).colorScheme.onPrimary,
+                                ),
+                              ),
+                            )
+                          : const Text('Add Member', style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Members',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-        Expanded(
-          child: StreamBuilder<List<Member>>(
-            stream: householdService.getHouseholdMembers(widget.householdId),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.people_outline,
-                        size: 64,
-                        color: Colors.grey[400],
+          const SizedBox(height: 12),
+          Expanded(
+            child: StreamBuilder<List<Member>>(
+              stream: householdService.getHouseholdMembers(widget.householdId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(
+                        Theme.of(context).colorScheme.primary,
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No members yet',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Add members using the form above',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  final member = snapshot.data![index];
-                  final authService = context.read<AuthService>();
-                  final currentUserId = authService.getCurrentUser()?.uid ?? '';
-                  final isCreator = member.id == currentUserId;
-
-                  return ListTile(
-                    leading: const Icon(Icons.person),
-                    title: Text(member.name),
-                    subtitle: Text(member.email),
-                    trailing: isCreator
-                        ? Padding(
-                            padding: const EdgeInsets.only(right: 16),
-                            child: Chip(
-                              label: const Text('Admin'),
-                              backgroundColor: Colors.blue[100],
-                            ),
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _removeMember(member.id),
-                          ),
+                    ),
                   );
-                },
-              );
-            },
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Icon(
+                            Icons.people_outline,
+                            size: 64,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'No members yet',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Add members using the form above',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final member = snapshot.data![index];
+                    final authService = context.read<AuthService>();
+                    final currentUserId = authService.getCurrentUser()?.uid ?? '';
+                    final isCreator = member.id == currentUserId;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          width: 1,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onLongPress: !isCreator ? () => _removeMember(member.id) : null,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        member.name,
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        member.email,
+                                        style: Theme.of(context).textTheme.labelSmall,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                if (isCreator)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.primaryContainer,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'Admin',
+                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.errorContainer,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Theme.of(context).colorScheme.error,
+                                        size: 20,
+                                      ),
+                                      onPressed: () => _removeMember(member.id),
+                                      padding: const EdgeInsets.all(8),
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

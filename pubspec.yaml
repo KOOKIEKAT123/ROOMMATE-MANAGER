@@ -52,6 +52,10 @@ dependencies:
   # UI/UX
   material_design_icons_flutter: ^7.0.7296
   
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+  timezone: ^0.9.2
+  
   # Environment variables
   flutter_dotenv: ^5.1.0
 

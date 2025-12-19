@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/expense_service.dart';
 import '../../services/household_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/settlement.dart';
 import '../../models/member.dart';
 
@@ -50,18 +51,44 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
       return;
     }
 
+    // Validate members are different
+    if (_fromMemberId == _toMemberId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot settle payment with the same member')),
+      );
+      return;
+    }
+
+    // Validate amount is positive
+    try {
+      final amount = double.parse(_amountController.text);
+      if (amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Amount must be greater than 0')),
+        );
+        return;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     try {
       final expenseService = context.read<ExpenseService>();
+      final householdService = context.read<HouseholdService>();
+      final amount = double.parse(_amountController.text);
 
       final settlement = Settlement(
         id: '',
         fromMemberId: _fromMemberId!,
         toMemberId: _toMemberId!,
-        amount: double.parse(_amountController.text),
+        amount: amount,
         method: _paymentMethod,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
         date: DateTime.now(),
@@ -71,9 +98,31 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
       await expenseService.addSettlement(settlement);
 
       if (mounted) {
+        // Get member names for notification
+        final members = await householdService
+            .getHouseholdMembers(widget.householdId)
+            .first;
+        final fromMember = members.firstWhere(
+          (m) => m.id == _fromMemberId,
+          orElse: () => members.isNotEmpty ? members.first : members[0],
+        );
+        final toMember = members.firstWhere(
+          (m) => m.id == _toMemberId,
+          orElse: () => members.isNotEmpty ? members.first : members[0],
+        );
+
+        // Show notification
+        NotificationService().showSettlementNotification(
+          title: '✅ Payment Recorded',
+          message: '${fromMember.name} paid ${toMember.name} \$${amount.toStringAsFixed(2)}',
+        );
+
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Settlement recorded')),
+          const SnackBar(
+            content: Text('Settlement recorded'),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } catch (e) {

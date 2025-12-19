@@ -20,18 +20,56 @@ class BalanceSheetScreen extends StatelessWidget {
         future: expenseService.calculateBalances(householdId),
         builder: (context, balanceSnapshot) {
           if (balanceSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Calculating balances...',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            );
           }
 
           if (!balanceSnapshot.hasData) {
-            return const Center(child: Text('Unable to load balances'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Unable to load balances',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ],
+              ),
+            );
           }
 
           return StreamBuilder<List<Member>>(
             stream: householdService.getHouseholdMembers(householdId),
             builder: (context, memberSnapshot) {
               if (memberSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                );
               }
 
               final members = memberSnapshot.data ?? [];
@@ -42,111 +80,100 @@ class BalanceSheetScreen extends StatelessWidget {
               final sortedEntries = balances.entries.toList()
                 ..sort((a, b) => a.value.compareTo(b.value));
 
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Balance Summary',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Balance Summary',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ...sortedEntries.map((entry) {
+                      final member = memberMap[entry.key];
+                      final balance = entry.value;
+                      
+                      if (balance.abs() < 0.01) return const SizedBox.shrink();
+                      
+                      final isOwing = balance > 0;
+                      final badgeColor = isOwing
+                          ? Theme.of(context).colorScheme.errorContainer
+                          : Theme.of(context).colorScheme.secondaryContainer;
+                      final badgeTextColor = isOwing
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.secondary;
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                            width: 1,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        ...sortedEntries.map((entry) {
-                          final member = memberMap[entry.key];
-                          final balance = entry.value;
-                          
-                          if (balance.abs() < 0.01) return const SizedBox.shrink();
-                          
-                          final color = balance > 0
-                              ? Colors.red
-                              : Colors.green;
-
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    member?.name ?? 'Unknown',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        member?.name ?? 'Unknown',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        isOwing ? 'Owes the group' : 'Owed by the group',
+                                        style: Theme.of(context).textTheme.labelSmall,
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    balance > 0
-                                        ? 'owes \$${balance.toStringAsFixed(2)}'
-                                        : 'is owed \$${(-balance).toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      color: color,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: badgeColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    isOwing
+                                        ? '\$${balance.toStringAsFixed(2)}'
+                                        : '\$${(-balance).toStringAsFixed(2)}',
+                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      color: badgeTextColor,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: members.length,
-                      itemBuilder: (context, index) {
-                        final member = members[index];
-                        final balance = balances[member.id] ?? 0;
-
-                        return ListTile(
-                          leading: const Icon(Icons.person),
-                          title: Text(member.name),
-                          trailing: Text(
-                            balance > 0
-                                ? 'owes \$${balance.toStringAsFixed(2)}'
-                                : balance < 0
-                                    ? 'is owed \$${(-balance).toStringAsFixed(2)}'
-                                    : 'settled',
-                            style: TextStyle(
-                              color: balance > 0
-                                  ? Colors.red
-                                  : balance < 0
-                                      ? Colors.green
-                                      : Colors.grey,
+                                ),
+                              ],
                             ),
                           ),
-                          onTap: balance != 0
-                              ? () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => SettleUpScreen(
-                                        householdId: householdId,
-                                        selectedMemberId: member.id,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              : null,
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               );
             },
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -154,7 +181,8 @@ class BalanceSheetScreen extends StatelessWidget {
             ),
           );
         },
-        child: const Icon(Icons.payment),
+        icon: const Icon(Icons.payment),
+        label: const Text('Settle Up'),
       ),
     );
   }

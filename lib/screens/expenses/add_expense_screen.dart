@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/expense_service.dart';
 import '../../services/household_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/expense.dart';
 import '../../models/member.dart';
 
@@ -37,6 +38,22 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         _selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    // Validate amount is positive
+    try {
+      final amount = double.parse(_amountController.text);
+      if (amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Amount must be greater than 0')),
+        );
+        return;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount')),
       );
       return;
     }
@@ -86,9 +103,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       await expenseService.addExpense(expense);
 
       if (mounted) {
+        // Show notification
+        NotificationService().showExpenseNotification(
+          title: '💰 Expense Added',
+          description: _descriptionController.text,
+          amount: '\$${amount.toStringAsFixed(2)}',
+        );
+        
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Expense added successfully')),
+          const SnackBar(
+            content: Text('Expense added successfully'),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } catch (e) {

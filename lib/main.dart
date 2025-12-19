@@ -9,6 +9,8 @@ import 'services/expense_service.dart';
 import 'services/chore_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/household_selection_screen.dart';
+import 'themes/app_theme.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,18 +27,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         Provider<AuthService>(create: (_) => AuthService()),
         Provider<HouseholdService>(create: (_) => HouseholdService()),
         Provider<ExpenseService>(create: (_) => ExpenseService()),
         Provider<ChoreService>(create: (_) => ChoreService()),
       ],
-      child: MaterialApp(
-        title: 'Roommate Manager',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        home: const AuthWrapper(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: 'Roommate Manager',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            home: const AuthWrapper(),
+          );
+        },
       ),
     );
   }
