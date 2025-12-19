@@ -9,7 +9,7 @@ import 'add_expense_screen.dart';
 class ExpensesScreen extends StatelessWidget {
   final String householdId;
 
-  const ExpensesScreen({Key? key, required this.householdId}) : super(key: key);
+  const ExpensesScreen({super.key, required this.householdId});
 
   @override
   Widget build(BuildContext context) {

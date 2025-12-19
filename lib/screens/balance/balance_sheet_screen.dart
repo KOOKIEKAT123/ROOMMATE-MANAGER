@@ -8,7 +8,7 @@ import 'settle_up_screen.dart';
 class BalanceSheetScreen extends StatelessWidget {
   final String householdId;
 
-  const BalanceSheetScreen({Key? key, required this.householdId}) : super(key: key);
+  const BalanceSheetScreen({super.key, required this.householdId});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +95,7 @@ class BalanceSheetScreen extends StatelessWidget {
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),

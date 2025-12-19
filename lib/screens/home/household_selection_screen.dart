@@ -7,7 +7,7 @@ import 'home_screen.dart';
 import 'create_household_screen.dart';
 
 class HouseholdSelectionScreen extends StatelessWidget {
-  const HouseholdSelectionScreen({Key? key}) : super(key: key);
+  const HouseholdSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

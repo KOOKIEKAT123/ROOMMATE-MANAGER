@@ -8,7 +8,7 @@ import '../../models/member.dart';
 class AddExpenseScreen extends StatefulWidget {
   final String householdId;
 
-  const AddExpenseScreen({Key? key, required this.householdId}) : super(key: key);
+  const AddExpenseScreen({super.key, required this.householdId});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -21,7 +21,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   String? _selectedCategory;
   SplitMethod _splitMethod = SplitMethod.equal;
   bool _isLoading = false;
-  Map<String, double> _customSplits = {};
+  final Map<String, double> _customSplits = {};
 
   @override
   void dispose() {
@@ -148,7 +148,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedPayerId,
+                  initialValue: _selectedPayerId,
                   items: members
                       .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name)))
                       .toList(),
@@ -166,7 +166,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedCategory,
+                  initialValue: _selectedCategory,
                   items: const [
                     DropdownMenuItem(value: 'Food', child: Text('Food')),
                     DropdownMenuItem(value: 'Utilities', child: Text('Utilities')),

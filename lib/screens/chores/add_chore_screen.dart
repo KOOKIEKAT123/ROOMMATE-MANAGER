@@ -8,7 +8,7 @@ import '../../models/member.dart';
 class AddChoreScreen extends StatefulWidget {
   final String householdId;
 
-  const AddChoreScreen({Key? key, required this.householdId}) : super(key: key);
+  const AddChoreScreen({super.key, required this.householdId});
 
   @override
   State<AddChoreScreen> createState() => _AddChoreScreenState();
@@ -104,7 +104,7 @@ class _AddChoreScreenState extends State<AddChoreScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedMemberId,
+                  initialValue: _selectedMemberId,
                   items: members
                       .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name)))
                       .toList(),

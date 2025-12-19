@@ -6,7 +6,7 @@ import '../../models/household.dart';
 import '../../models/member.dart';
 
 class CreateHouseholdScreen extends StatefulWidget {
-  const CreateHouseholdScreen({Key? key}) : super(key: key);
+  const CreateHouseholdScreen({super.key});
 
   @override
   State<CreateHouseholdScreen> createState() => _CreateHouseholdScreenState();

@@ -9,7 +9,7 @@ import 'add_chore_screen.dart';
 class ChoresScreen extends StatelessWidget {
   final String householdId;
 
-  const ChoresScreen({Key? key, required this.householdId}) : super(key: key);
+  const ChoresScreen({super.key, required this.householdId});
 
   @override
   Widget build(BuildContext context) {

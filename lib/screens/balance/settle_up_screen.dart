@@ -10,10 +10,10 @@ class SettleUpScreen extends StatefulWidget {
   final String? selectedMemberId;
 
   const SettleUpScreen({
-    Key? key,
+    super.key,
     required this.householdId,
     this.selectedMemberId,
-  }) : super(key: key);
+  });
 
   @override
   State<SettleUpScreen> createState() => _SettleUpScreenState();
@@ -111,7 +111,7 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
             child: Column(
               children: [
                 DropdownButtonFormField<String>(
-                  value: _fromMemberId,
+                  initialValue: _fromMemberId,
                   items: members
                       .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name)))
                       .toList(),
@@ -129,7 +129,7 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _toMemberId,
+                  initialValue: _toMemberId,
                   items: members
                       .where((m) => m.id != _fromMemberId)
                       .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name)))

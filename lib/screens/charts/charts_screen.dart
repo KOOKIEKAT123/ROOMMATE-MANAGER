@@ -10,7 +10,7 @@ import '../../models/member.dart';
 class ChartsScreen extends StatefulWidget {
   final String householdId;
 
-  const ChartsScreen({Key? key, required this.householdId}) : super(key: key);
+  const ChartsScreen({super.key, required this.householdId});
 
   @override
   State<ChartsScreen> createState() => _ChartsScreenState();
@@ -187,7 +187,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                     const SizedBox(height: 24),
                     const Text(
                       'Total Expenses by Member',
@@ -212,7 +212,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               );

@@ -7,7 +7,7 @@ import '../../models/member.dart';
 class MembersScreen extends StatefulWidget {
   final String householdId;
 
-  const MembersScreen({Key? key, required this.householdId}) : super(key: key);
+  const MembersScreen({super.key, required this.householdId});
 
   @override
   State<MembersScreen> createState() => _MembersScreenState();

@@ -12,7 +12,7 @@ import '../charts/charts_screen.dart';
 class HomeScreen extends StatefulWidget {
   final String householdId;
   
-  const HomeScreen({Key? key, required this.householdId}) : super(key: key);
+  const HomeScreen({super.key, required this.householdId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
