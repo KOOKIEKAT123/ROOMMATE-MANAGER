@@ -15,18 +15,17 @@ class NotificationService {
   void _initializeNotifications() {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
-    const DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
+    const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
@@ -40,8 +39,7 @@ class NotificationService {
     required String description,
     required String amount,
   }) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'expense_channel',
       'Expense Notifications',
       channelDescription: 'Notifications for expense activities',
@@ -50,8 +48,7 @@ class NotificationService {
       icon: '@mipmap/ic_launcher',
     );
 
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -76,8 +73,7 @@ class NotificationService {
     required String choreTitle,
     required String assignee,
   }) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'chore_channel',
       'Chore Notifications',
       channelDescription: 'Notifications for chore deadlines',
@@ -86,8 +82,7 @@ class NotificationService {
       icon: '@mipmap/ic_launcher',
     );
 
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -107,12 +102,8 @@ class NotificationService {
   }
 
   // Show notification for settlement
-  Future<void> showSettlementNotification({
-    required String title,
-    required String message,
-  }) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+  Future<void> showSettlementNotification({required String title, required String message}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'settlement_channel',
       'Settlement Notifications',
       channelDescription: 'Notifications for payments and settlements',
@@ -121,8 +112,7 @@ class NotificationService {
       icon: '@mipmap/ic_launcher',
     );
 
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -133,20 +123,12 @@ class NotificationService {
       iOS: iOSPlatformChannelSpecifics,
     );
 
-    await _flutterLocalNotificationsPlugin.show(
-      DateTime.now().hashCode,
-      title,
-      message,
-      platformChannelSpecifics,
-    );
+    await _flutterLocalNotificationsPlugin.show(DateTime.now().hashCode, title, message, platformChannelSpecifics);
   }
 
   // Show notification for member joined
-  Future<void> showMemberJoinedNotification({
-    required String memberName,
-  }) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+  Future<void> showMemberJoinedNotification({required String memberName}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'member_channel',
       'Member Notifications',
       channelDescription: 'Notifications for member activities',
@@ -155,8 +137,7 @@ class NotificationService {
       icon: '@mipmap/ic_launcher',
     );
 
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -186,8 +167,7 @@ class NotificationService {
 
     // Send reminder 1 day before deadline
     if (daysUntilDeadline == 1) {
-      const AndroidNotificationDetails androidPlatformChannelSpecifics =
-          AndroidNotificationDetails(
+      const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'chore_deadline_channel',
         'Chore Deadline Reminders',
         channelDescription: 'Reminders for upcoming chore deadlines',
@@ -196,8 +176,7 @@ class NotificationService {
         icon: '@mipmap/ic_launcher',
       );
 
-      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-          DarwinNotificationDetails(
+      const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,

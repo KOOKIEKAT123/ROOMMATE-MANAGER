@@ -4,12 +4,7 @@ class Member {
   final String email;
   final DateTime createdAt;
 
-  Member({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.createdAt,
-  });
+  Member({required this.id, required this.name, required this.email, required this.createdAt});
 
   factory Member.fromMap(Map<String, dynamic> data, String docId) {
     return Member(
@@ -21,11 +16,6 @@ class Member {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'createdAt': createdAt,
-    };
+    return {'id': id, 'name': name, 'email': email, 'createdAt': createdAt};
   }
 }

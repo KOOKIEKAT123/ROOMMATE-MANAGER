@@ -9,11 +9,8 @@ class AuthService {
 
   Future<User?> signUp(String email, String password) async {
     try {
-      final UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
+      final UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+
       // Create user record in Firestore
       if (result.user != null) {
         await _firestore.collection('users').doc(result.user!.uid).set({
@@ -23,7 +20,7 @@ class AuthService {
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }
-      
+
       return result.user;
     } on FirebaseAuthException {
       rethrow;
@@ -32,10 +29,7 @@ class AuthService {
 
   Future<User?> signIn(String email, String password) async {
     try {
-      final UserCredential result = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       return result.user;
     } on FirebaseAuthException {
       rethrow;

@@ -25,9 +25,7 @@ class ChoreService {
         .doc(householdId)
         .collection('chores')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Chore.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Chore.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Get member's chores
@@ -38,21 +36,13 @@ class ChoreService {
         .collection('chores')
         .where('assignedTo', isEqualTo: memberId)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Chore.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Chore.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Mark chore as completed
-  Future<void> markChoreCompleted(
-      String householdId, String choreId) async {
+  Future<void> markChoreCompleted(String householdId, String choreId) async {
     try {
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .collection('chores')
-          .doc(choreId)
-          .update({
+      await _firestore.collection('households').doc(householdId).collection('chores').doc(choreId).update({
         'completed': true,
         'lastCompletedAt': DateTime.now(),
       });
@@ -62,15 +52,9 @@ class ChoreService {
   }
 
   // Mark chore as incomplete (for weekly reset)
-  Future<void> markChoreIncomplete(
-      String householdId, String choreId) async {
+  Future<void> markChoreIncomplete(String householdId, String choreId) async {
     try {
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .collection('chores')
-          .doc(choreId)
-          .update({
+      await _firestore.collection('households').doc(householdId).collection('chores').doc(choreId).update({
         'completed': false,
       });
     } catch (e) {
@@ -79,15 +63,9 @@ class ChoreService {
   }
 
   // Update chore
-  Future<void> updateChore(
-      String householdId, String choreId, Map<String, dynamic> data) async {
+  Future<void> updateChore(String householdId, String choreId, Map<String, dynamic> data) async {
     try {
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .collection('chores')
-          .doc(choreId)
-          .update(data);
+      await _firestore.collection('households').doc(householdId).collection('chores').doc(choreId).update(data);
     } catch (e) {
       rethrow;
     }
@@ -96,12 +74,7 @@ class ChoreService {
   // Delete chore
   Future<void> deleteChore(String householdId, String choreId) async {
     try {
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .collection('chores')
-          .doc(choreId)
-          .delete();
+      await _firestore.collection('households').doc(householdId).collection('chores').doc(choreId).delete();
     } catch (e) {
       rethrow;
     }
@@ -118,9 +91,7 @@ class ChoreService {
           .where('completed', isEqualTo: false)
           .get();
 
-      return snapshot.docs
-          .map((doc) => Chore.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-          .toList();
+      return snapshot.docs.map((doc) => Chore.fromMap(doc.data() as Map<String, dynamic>, doc.id)).toList();
     } catch (e) {
       rethrow;
     }

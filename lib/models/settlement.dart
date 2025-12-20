@@ -1,4 +1,4 @@
-enum PaymentMethod { cash, venmo, paypal, bank_transfer }
+enum PaymentMethod { cash, bkash, bankTransfer }
 
 class Settlement {
   final String id;
@@ -27,11 +27,10 @@ class Settlement {
       fromMemberId: data['fromMemberId'] ?? '',
       toMemberId: data['toMemberId'] ?? '',
       amount: (data['amount'] ?? 0).toDouble(),
-      method:
-          PaymentMethod.values.firstWhere(
-            (e) => e.toString() == 'PaymentMethod.${data['method']}',
-            orElse: () => PaymentMethod.cash,
-          ),
+      method: PaymentMethod.values.firstWhere(
+        (e) => e.toString() == 'PaymentMethod.${data['method']}',
+        orElse: () => PaymentMethod.cash,
+      ),
       notes: data['notes'],
       date: (data['date'] as dynamic)?.toDate() ?? DateTime.now(),
       householdId: data['householdId'] ?? '',

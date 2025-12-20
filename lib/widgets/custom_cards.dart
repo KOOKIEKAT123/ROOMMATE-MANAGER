@@ -28,10 +28,7 @@ class StatCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: backgroundColor ?? Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outlineVariant,
-              width: 1,
-            ),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,17 +43,9 @@ class StatCard extends StatelessWidget {
                 child: icon,
               ),
               const SizedBox(height: 16),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text(title, style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
         ),
@@ -83,21 +72,18 @@ class InteractiveCard extends StatefulWidget {
   State<InteractiveCard> createState() => _InteractiveCardState();
 }
 
-class _InteractiveCardState extends State<InteractiveCard>
-    with SingleTickerProviderStateMixin {
+class _InteractiveCardState extends State<InteractiveCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _elevationAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _elevationAnimation = Tween<double>(begin: 0, end: 8).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _controller = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
+    _elevationAnimation = Tween<double>(
+      begin: 0,
+      end: 8,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -119,10 +105,7 @@ class _InteractiveCardState extends State<InteractiveCard>
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: widget.borderRadius,
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
-                width: 1,
-              ),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(int.parse((_elevationAnimation.value * 0.15 * 255).toStringAsFixed(0))),
@@ -133,11 +116,7 @@ class _InteractiveCardState extends State<InteractiveCard>
             ),
             child: Material(
               color: Colors.transparent,
-              child: InkWell(
-                onTap: widget.onTap,
-                borderRadius: widget.borderRadius,
-                child: widget.child,
-              ),
+              child: InkWell(onTap: widget.onTap, borderRadius: widget.borderRadius, child: widget.child),
             ),
           );
         },
@@ -150,11 +129,7 @@ class GlassmorphicCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
 
-  const GlassmorphicCard({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(20),
-  });
+  const GlassmorphicCard({super.key, required this.child, this.padding = const EdgeInsets.all(20)});
 
   @override
   Widget build(BuildContext context) {
@@ -163,10 +138,7 @@ class GlassmorphicCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface.withAlpha(int.parse((0.8 * 255).toStringAsFixed(0))),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outlineVariant,
-          width: 1.5,
-        ),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(int.parse((0.05 * 255).toStringAsFixed(0))),

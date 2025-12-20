@@ -19,9 +19,7 @@ class DefaultFirebaseOptions {
           storageBucket: 'YOUR_STORAGE_BUCKET_HERE',
         );
       default:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions are only configured for Android in this project.',
-        );
+        throw UnsupportedError('DefaultFirebaseOptions are only configured for Android in this project.');
     }
   }
 }

@@ -25,11 +25,10 @@ class Chore {
     return Chore(
       id: docId,
       title: data['title'] ?? '',
-      frequency:
-          ChoreFrequency.values.firstWhere(
-            (e) => e.toString() == 'ChoreFrequency.${data['frequency']}',
-            orElse: () => ChoreFrequency.weekly,
-          ),
+      frequency: ChoreFrequency.values.firstWhere(
+        (e) => e.toString() == 'ChoreFrequency.${data['frequency']}',
+        orElse: () => ChoreFrequency.weekly,
+      ),
       assignedTo: data['assignedTo'] ?? '',
       completed: data['completed'] ?? false,
       createdAt: (data['createdAt'] as dynamic)?.toDate() ?? DateTime.now(),

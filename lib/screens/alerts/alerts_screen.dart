@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/expense_service.dart';
@@ -17,11 +19,38 @@ class AlertsScreen extends StatelessWidget {
     final choreService = context.read<ChoreService>();
     final householdService = context.read<HouseholdService>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Alerts & Reminders'),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.18),
+            Theme.of(context).colorScheme.surface.withOpacity(0.6),
+            Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.18),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
-      body: FutureBuilder<Map<String, double>>(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('Alerts & Reminders'),
+        ),
+        body: Stack(
+          children: [
+            Positioned(
+              top: -120,
+              right: -80,
+              child: _glowBlob(140, Theme.of(context).colorScheme.primary.withOpacity(0.12)),
+            ),
+            Positioned(
+              bottom: -100,
+              left: -70,
+              child: _glowBlob(120, Theme.of(context).colorScheme.error.withOpacity(0.1)),
+            ),
+            FutureBuilder<Map<String, double>>(
         future: expenseService.calculateBalances(householdId),
         builder: (context, balanceSnapshot) {
           return StreamBuilder<List<Chore>>(
@@ -132,7 +161,9 @@ class AlertsScreen extends StatelessWidget {
                                   child: Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
                                 ),
                                 title: Text('Overdue: "${c.title}" assigned to $assignee'),
-                                subtitle: Text('${c.frequency.toString().split('.').last.toUpperCase()}  •  $daysAgo day(s) ago'),
+                                subtitle: Text(
+                                  '${c.frequency.toString().split('.').last.toUpperCase()}  •  $daysAgo day(s) ago',
+                                ),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.done),
                                   tooltip: 'Mark complete',
@@ -150,7 +181,9 @@ class AlertsScreen extends StatelessWidget {
                               child: OutlinedButton(
                                 onPressed: () {
                                   // Mark all as read is just a UX affordance here
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All caught up!')));
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(const SnackBar(content: Text('All caught up!')));
                                 },
                                 child: const Text('Mark all as read'),
                               ),
@@ -175,6 +208,27 @@ class AlertsScreen extends StatelessWidget {
             },
           );
         },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _glowBlob(double size, Color color) {
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [color, Colors.transparent],
+              radius: 0.85,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -206,10 +260,7 @@ class AlertsScreen extends StatelessWidget {
         children: [
           Text(
             value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: textColor),
           ),
           const SizedBox(height: 4),
           Row(

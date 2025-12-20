@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/household_service.dart';
@@ -183,8 +185,33 @@ class _MembersScreenState extends State<MembersScreen> {
   Widget build(BuildContext context) {
     final householdService = context.read<HouseholdService>();
 
-    return Scaffold(
-      body: Column(
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.18),
+            Theme.of(context).colorScheme.surface.withOpacity(0.6),
+            Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.18),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            Positioned(
+              top: -120,
+              right: -80,
+              child: _glowBlob(140, Theme.of(context).colorScheme.primary.withOpacity(0.12)),
+            ),
+            Positioned(
+              bottom: -100,
+              left: -70,
+              child: _glowBlob(120, Theme.of(context).colorScheme.tertiary.withOpacity(0.12)),
+            ),
+            Column(
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -416,6 +443,27 @@ class _MembersScreenState extends State<MembersScreen> {
             ),
           ),
         ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _glowBlob(double size, Color color) {
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [color, Colors.transparent],
+              radius: 0.85,
+            ),
+          ),
+        ),
       ),
     );
   }

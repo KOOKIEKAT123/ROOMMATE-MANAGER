@@ -21,20 +21,12 @@ class Household {
       name: data['name'] ?? '',
       ownerId: data['ownerId'] ?? '',
       memberIds: List<String>.from(data['memberIds'] ?? []),
-      categories: List<String>.from(
-        data['categories'] ?? ['Food', 'Utilities', 'Rent', 'Entertainment', 'Other'],
-      ),
+      categories: List<String>.from(data['categories'] ?? ['Food', 'Utilities', 'Rent', 'Entertainment', 'Other']),
       createdAt: (data['createdAt'] as dynamic)?.toDate() ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'ownerId': ownerId,
-      'memberIds': memberIds,
-      'categories': categories,
-      'createdAt': createdAt,
-    };
+    return {'name': name, 'ownerId': ownerId, 'memberIds': memberIds, 'categories': categories, 'createdAt': createdAt};
   }
 }

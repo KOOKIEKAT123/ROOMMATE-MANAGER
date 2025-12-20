@@ -29,11 +29,10 @@ class Expense {
       description: data['description'] ?? '',
       amount: (data['amount'] ?? 0).toDouble(),
       payerId: data['payerId'] ?? '',
-      splitMethod:
-          SplitMethod.values.firstWhere(
-            (e) => e.toString() == 'SplitMethod.${data['splitMethod']}',
-            orElse: () => SplitMethod.equal,
-          ),
+      splitMethod: SplitMethod.values.firstWhere(
+        (e) => e.toString() == 'SplitMethod.${data['splitMethod']}',
+        orElse: () => SplitMethod.equal,
+      ),
       splits: Map<String, double>.from(
         (data['splits'] as Map?)?.map((k, v) => MapEntry(k, (v as num).toDouble())) ?? {},
       ),

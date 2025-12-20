@@ -21,10 +21,7 @@ class FadeInUp extends StatelessWidget {
       builder: (context, value, child) {
         return Transform.translate(
           offset: Offset(0, 20 * (1 - value)),
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
+          child: Opacity(opacity: value, child: child),
         );
       },
       child: child,
@@ -53,10 +50,7 @@ class ScaleIn extends StatelessWidget {
       builder: (context, value, child) {
         return Transform.scale(
           scale: value,
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
+          child: Opacity(opacity: value, child: child),
         );
       },
       child: child,
@@ -86,14 +80,8 @@ class SlideIn extends StatelessWidget {
       curve: curve,
       builder: (context, value, child) {
         return Transform.translate(
-          offset: Offset(
-            beginOffset.dx * 100 * (1 - value),
-            beginOffset.dy * 100 * (1 - value),
-          ),
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
+          offset: Offset(beginOffset.dx * 100 * (1 - value), beginOffset.dy * 100 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
         );
       },
       child: child,
@@ -114,26 +102,21 @@ class FloatingActionButton3DPress extends StatefulWidget {
   });
 
   @override
-  State<FloatingActionButton3DPress> createState() =>
-      _FloatingActionButton3DPressState();
+  State<FloatingActionButton3DPress> createState() => _FloatingActionButton3DPressState();
 }
 
-class _FloatingActionButton3DPressState
-    extends State<FloatingActionButton3DPress>
-    with SingleTickerProviderStateMixin {
+class _FloatingActionButton3DPressState extends State<FloatingActionButton3DPress> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.pressDuration,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _controller = AnimationController(duration: widget.pressDuration, vsync: this);
+    _scaleAnimation = Tween<double>(
+      begin: 1,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -155,10 +138,7 @@ class _FloatingActionButton3DPressState
       onTapCancel: () {
         _controller.reverse();
       },
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
-      ),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }

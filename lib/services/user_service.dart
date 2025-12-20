@@ -7,15 +7,12 @@ class UserService {
   // Create or update user record
   Future<void> createOrUpdateUser(User firebaseUser) async {
     try {
-      await _firestore.collection('users').doc(firebaseUser.uid).set(
-        {
-          'uid': firebaseUser.uid,
-          'email': firebaseUser.email?.toLowerCase() ?? '',
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      await _firestore.collection('users').doc(firebaseUser.uid).set({
+        'uid': firebaseUser.uid,
+        'email': firebaseUser.email?.toLowerCase() ?? '',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       rethrow;
     }
@@ -24,12 +21,8 @@ class UserService {
   // Get user by email
   Future<String?> getUserIdByEmail(String email) async {
     try {
-      final result = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email.toLowerCase())
-          .limit(1)
-          .get();
-      
+      final result = await _firestore.collection('users').where('email', isEqualTo: email.toLowerCase()).limit(1).get();
+
       if (result.docs.isNotEmpty) {
         return result.docs.first.id;
       }

@@ -13,7 +13,7 @@ import '../../providers/theme_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final String householdId;
-  
+
   const HomeScreen({super.key, required this.householdId});
 
   @override
@@ -27,10 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _fabAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _fabAnimationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
   }
 
   @override
@@ -53,16 +50,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(
-                      Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
+                  CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary)),
                   const SizedBox(height: 16),
-                  Text(
-                    'Loading household...',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text('Loading household...', style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
             ),
@@ -75,16 +65,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.home_work_outlined,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
+                  Icon(Icons.home_work_outlined, size: 64, color: Theme.of(context).colorScheme.outline),
                   const SizedBox(height: 16),
-                  Text(
-                    'Household not found',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
+                  Text('Household not found', style: Theme.of(context).textTheme.headlineSmall),
                 ],
               ),
             ),
@@ -101,14 +84,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Text(
                   household.name,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  'Household',
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
+                Text('Household', style: Theme.of(context).textTheme.labelSmall),
               ],
             ),
             actions: [
@@ -128,10 +106,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           transitionBuilder: (child, animation) {
                             return ScaleTransition(scale: animation, child: child);
                           },
-                          child: Icon(
-                            isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                            key: ValueKey(isDarkMode),
-                          ),
+                          child: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode, key: ValueKey(isDarkMode)),
                         ),
                         onPressed: () {
                           context.read<ThemeProvider>().toggleTheme();
@@ -161,18 +136,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               title: const Text('Sign Out'),
                               content: const Text('Are you sure you want to sign out?'),
                               actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
-                                ),
+                                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: Text(
-                                    'Sign Out',
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.error,
-                                    ),
-                                  ),
+                                  child: Text('Sign Out', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                 ),
                               ],
                             ),
@@ -188,9 +155,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               }
                             } catch (e) {
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Sign out error: $e')),
-                                );
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text('Sign out error: $e')));
                               }
                             }
                           }
@@ -267,10 +234,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildNavIcon(IconData icon, int index) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      child: Icon(icon),
-    );
+    return AnimatedContainer(duration: const Duration(milliseconds: 300), child: Icon(icon));
   }
 
   Widget _buildNavIconActive(IconData icon, int index) {

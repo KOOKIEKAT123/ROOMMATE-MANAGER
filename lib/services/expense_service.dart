@@ -27,17 +27,11 @@ class ExpenseService {
         .collection('expenses')
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Expense.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Expense.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Get expenses by date range
-  Stream<List<Expense>> getExpensesByDateRange(
-    String householdId,
-    DateTime startDate,
-    DateTime endDate,
-  ) {
+  Stream<List<Expense>> getExpensesByDateRange(String householdId, DateTime startDate, DateTime endDate) {
     return _firestore
         .collection('households')
         .doc(householdId)
@@ -46,20 +40,13 @@ class ExpenseService {
         .where('date', isLessThanOrEqualTo: endDate)
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Expense.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Expense.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Delete expense
   Future<void> deleteExpense(String householdId, String expenseId) async {
     try {
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .collection('expenses')
-          .doc(expenseId)
-          .delete();
+      await _firestore.collection('households').doc(householdId).collection('expenses').doc(expenseId).delete();
     } catch (e) {
       rethrow;
     }
@@ -87,9 +74,7 @@ class ExpenseService {
         .collection('settlements')
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Settlement.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Settlement.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Calculate balances
@@ -113,25 +98,22 @@ class ExpenseService {
       // Process expenses
       for (var doc in expensesSnapshot.docs) {
         Expense expense = Expense.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-        
+
         // Each person's balance = what they owe - what they paid
         for (var entry in expense.splits.entries) {
           String memberId = entry.key;
           double owedAmount = entry.value;
           balances[memberId] = (balances[memberId] ?? 0) - owedAmount;
         }
-        
+
         balances[expense.payerId] = (balances[expense.payerId] ?? 0) + expense.amount;
       }
 
       // Process settlements
       for (var doc in settlementsSnapshot.docs) {
-        Settlement settlement =
-            Settlement.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-        balances[settlement.fromMemberId] =
-            (balances[settlement.fromMemberId] ?? 0) - settlement.amount;
-        balances[settlement.toMemberId] =
-            (balances[settlement.toMemberId] ?? 0) + settlement.amount;
+        Settlement settlement = Settlement.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+        balances[settlement.fromMemberId] = (balances[settlement.fromMemberId] ?? 0) - settlement.amount;
+        balances[settlement.toMemberId] = (balances[settlement.toMemberId] ?? 0) + settlement.amount;
       }
 
       return balances;

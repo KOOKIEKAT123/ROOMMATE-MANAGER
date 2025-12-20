@@ -8,9 +8,7 @@ class HouseholdService {
   // Create a household
   Future<String> createHousehold(Household household) async {
     try {
-      DocumentReference docRef = await _firestore
-          .collection('households')
-          .add(household.toMap());
+      DocumentReference docRef = await _firestore.collection('households').add(household.toMap());
       return docRef.id;
     } catch (e) {
       rethrow;
@@ -20,8 +18,7 @@ class HouseholdService {
   // Get household
   Future<Household?> getHousehold(String householdId) async {
     try {
-      DocumentSnapshot doc =
-          await _firestore.collection('households').doc(householdId).get();
+      DocumentSnapshot doc = await _firestore.collection('households').doc(householdId).get();
       if (doc.exists) {
         return Household.fromMap(doc.data() as Map<String, dynamic>, doc.id);
       }
@@ -37,17 +34,12 @@ class HouseholdService {
         .collection('households')
         .where('memberIds', arrayContains: userId)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Household.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Household.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Add member to household
-  Future<void> addMemberToHousehold(
-      String householdId, Member member) async {
+  Future<void> addMemberToHousehold(String householdId, Member member) async {
     try {
-      print('DEBUG: addMemberToHousehold called with householdId=$householdId, memberId=${member.id}');
-      
       // Add member to members subcollection
       await _firestore
           .collection('households')
@@ -56,19 +48,11 @@ class HouseholdService {
           .doc(member.id)
           .set(member.toMap());
 
-      print('DEBUG: Member document created');
-
       // Add member ID to household's memberIds array
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .update({
-        'memberIds': FieldValue.arrayUnion([member.id])
+      await _firestore.collection('households').doc(householdId).update({
+        'memberIds': FieldValue.arrayUnion([member.id]),
       });
-      
-      print('DEBUG: memberIds array updated');
     } catch (e) {
-      print('DEBUG: Error in addMemberToHousehold: $e');
       rethrow;
     }
   }
@@ -80,18 +64,13 @@ class HouseholdService {
         .doc(householdId)
         .collection('members')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Member.fromMap(doc.data(), doc.id))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Member.fromMap(doc.data(), doc.id)).toList());
   }
 
   // Update household
   Future<void> updateHousehold(String householdId, Map<String, dynamic> data) async {
     try {
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .update(data);
+      await _firestore.collection('households').doc(householdId).update(data);
     } catch (e) {
       rethrow;
     }
@@ -109,18 +88,11 @@ class HouseholdService {
   // Check if email is registered
   Future<bool> isEmailRegistered(String email) async {
     try {
-      print('DEBUG: isEmailRegistered called with email: $email');
       // Check if the email exists in a users collection
-      final result = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email.toLowerCase())
-          .limit(1)
-          .get();
-      
-      print('DEBUG: Found ${result.docs.length} users with email: $email');
+      final result = await _firestore.collection('users').where('email', isEqualTo: email.toLowerCase()).limit(1).get();
+
       return result.docs.isNotEmpty;
     } catch (e) {
-      print('DEBUG: Error in isEmailRegistered: $e');
       // If collection doesn't exist, return false
       return false;
     }
@@ -129,44 +101,27 @@ class HouseholdService {
   // Get user ID by email
   Future<String?> getUserIdByEmail(String email) async {
     try {
-      print('DEBUG: getUserIdByEmail called with email: $email');
-      final result = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email.toLowerCase())
-          .limit(1)
-          .get();
-      
+      final result = await _firestore.collection('users').where('email', isEqualTo: email.toLowerCase()).limit(1).get();
+
       if (result.docs.isNotEmpty) {
         final userId = result.docs.first.id;
-        print('DEBUG: Found user ID: $userId');
         return userId;
       }
-      print('DEBUG: No user found for email: $email');
       return null;
     } catch (e) {
-      print('DEBUG: Error in getUserIdByEmail: $e');
       return null;
     }
   }
 
   // Remove member from household
-  Future<void> removeMemberFromHousehold(
-      String householdId, String memberId) async {
+  Future<void> removeMemberFromHousehold(String householdId, String memberId) async {
     try {
       // Remove member document
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .collection('members')
-          .doc(memberId)
-          .delete();
+      await _firestore.collection('households').doc(householdId).collection('members').doc(memberId).delete();
 
       // Remove member ID from household's memberIds array
-      await _firestore
-          .collection('households')
-          .doc(householdId)
-          .update({
-        'memberIds': FieldValue.arrayRemove([memberId])
+      await _firestore.collection('households').doc(householdId).update({
+        'memberIds': FieldValue.arrayRemove([memberId]),
       });
     } catch (e) {
       rethrow;
