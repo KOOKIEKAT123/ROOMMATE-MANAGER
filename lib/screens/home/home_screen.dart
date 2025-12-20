@@ -9,6 +9,7 @@ import '../chores/chores_screen.dart';
 import '../members/members_screen.dart';
 import '../charts/charts_screen.dart';
 import '../alerts/alerts_screen.dart';
+import '../chat/chat_screen.dart';
 import '../../providers/theme_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -175,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               MembersScreen(householdId: widget.householdId),
               ExpensesScreen(householdId: widget.householdId),
               ChoresScreen(householdId: widget.householdId),
+              ChatScreen(householdId: widget.householdId),
               AlertsScreen(householdId: widget.householdId),
               ChartsScreen(householdId: widget.householdId),
             ],
@@ -216,13 +218,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   label: 'Chores',
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildNavIcon(Icons.notifications, 3),
-                  activeIcon: _buildNavIconActive(Icons.notifications, 3),
+                  icon: _buildNavIcon(Icons.chat_bubble, 3),
+                  activeIcon: _buildNavIconActive(Icons.chat_bubble, 3),
+                  label: 'Chat',
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildNavIcon(Icons.notifications, 4),
+                  activeIcon: _buildNavIconActive(Icons.notifications, 4),
                   label: 'Alerts',
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildNavIcon(Icons.pie_chart, 4),
-                  activeIcon: _buildNavIconActive(Icons.pie_chart, 4),
+                  icon: _buildNavIcon(Icons.pie_chart, 5),
+                  activeIcon: _buildNavIconActive(Icons.pie_chart, 5),
                   label: 'Charts',
                 ),
               ],

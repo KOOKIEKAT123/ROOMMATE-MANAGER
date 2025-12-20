@@ -7,6 +7,8 @@ import 'services/auth_service.dart';
 import 'services/household_service.dart';
 import 'services/expense_service.dart';
 import 'services/chore_service.dart';
+import 'services/chat_service.dart';
+import 'services/user_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/household_selection_screen.dart';
 import 'themes/app_theme.dart';
@@ -30,6 +32,8 @@ class MyApp extends StatelessWidget {
         Provider<HouseholdService>(create: (_) => HouseholdService()),
         Provider<ExpenseService>(create: (_) => ExpenseService()),
         Provider<ChoreService>(create: (_) => ChoreService()),
+        Provider<ChatService>(create: (_) => ChatService()),
+        Provider<UserService>(create: (_) => UserService()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
