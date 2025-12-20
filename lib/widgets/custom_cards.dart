@@ -8,13 +8,13 @@ class StatCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const StatCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.icon,
     this.backgroundColor,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +72,12 @@ class InteractiveCard extends StatefulWidget {
   final BorderRadius borderRadius;
 
   const InteractiveCard({
-    Key? key,
+    super.key,
     required this.child,
     this.onTap,
     this.padding = const EdgeInsets.all(16),
     this.borderRadius = const BorderRadius.all(Radius.circular(16)),
-  }) : super(key: key);
+  });
 
   @override
   State<InteractiveCard> createState() => _InteractiveCardState();
@@ -151,10 +151,10 @@ class GlassmorphicCard extends StatelessWidget {
   final EdgeInsets padding;
 
   const GlassmorphicCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

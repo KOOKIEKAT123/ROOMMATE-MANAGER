@@ -6,11 +6,11 @@ class FadeInUp extends StatelessWidget {
   final Curve curve;
 
   const FadeInUp({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeOut,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +38,11 @@ class ScaleIn extends StatelessWidget {
   final Curve curve;
 
   const ScaleIn({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 400),
     this.curve = Curves.elasticOut,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,12 +71,12 @@ class SlideIn extends StatelessWidget {
   final Offset beginOffset;
 
   const SlideIn({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeOut,
     this.beginOffset = const Offset(-0.5, 0),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -107,11 +107,11 @@ class FloatingActionButton3DPress extends StatefulWidget {
   final Duration pressDuration;
 
   const FloatingActionButton3DPress({
-    Key? key,
+    super.key,
     required this.child,
     required this.onPressed,
     this.pressDuration = const Duration(milliseconds: 100),
-  }) : super(key: key);
+  });
 
   @override
   State<FloatingActionButton3DPress> createState() =>

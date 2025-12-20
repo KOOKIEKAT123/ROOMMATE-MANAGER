@@ -132,7 +132,7 @@ class AlertsScreen extends StatelessWidget {
                                   child: Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
                                 ),
                                 title: Text('Overdue: "${c.title}" assigned to $assignee'),
-                                subtitle: Text(c.frequency.toString().split('.').last.toUpperCase() + '  •  $daysAgo day(s) ago'),
+                                subtitle: Text('${c.frequency.toString().split('.').last.toUpperCase()}  •  $daysAgo day(s) ago'),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.done),
                                   tooltip: 'Mark complete',

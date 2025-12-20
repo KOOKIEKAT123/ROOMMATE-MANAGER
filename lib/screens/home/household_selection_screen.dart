@@ -9,6 +9,52 @@ import 'create_household_screen.dart';
 class HouseholdSelectionScreen extends StatelessWidget {
   const HouseholdSelectionScreen({super.key});
 
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    Household household,
+    HouseholdService householdService,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Delete Household'),
+        content: Text(
+          'Are you sure you want to delete "${household.name}"? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              try {
+                await householdService.deleteHousehold(household.id);
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${household.name} deleted')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error deleting household: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = context.read<AuthService>();
@@ -112,7 +158,30 @@ class HouseholdSelectionScreen extends StatelessWidget {
               return ListTile(
                 title: Text(household.name),
                 subtitle: Text('${household.memberIds.length} members'),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                trailing: PopupMenuButton(
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem(
+                      child: const Text('Open'),
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => HomeScreen(householdId: household.id),
+                          ),
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      child: const Text('Delete'),
+                      onTap: () {
+                        _showDeleteConfirmationDialog(
+                          context,
+                          household,
+                          householdService,
+                        );
+                      },
+                    ),
+                  ],
+                ),
                 onTap: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(

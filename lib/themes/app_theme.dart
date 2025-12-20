@@ -37,7 +37,6 @@ class AppTheme {
       outline: Color(0xFFCBD5E1),
       outlineVariant: Color(0xFFE2E8F0),
       scrim: Color(0xFF000000),
-      background: lightBackground,
     ),
     scaffoldBackgroundColor: lightBackground,
     appBarTheme: const AppBarTheme(
@@ -153,7 +152,6 @@ class AppTheme {
       outline: Color(0xFF64748B),
       outlineVariant: Color(0xFF475569),
       scrim: Color(0xFF000000),
-      background: darkBackground,
     ),
     scaffoldBackgroundColor: darkBackground,
     appBarTheme: const AppBarTheme(
