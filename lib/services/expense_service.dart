@@ -103,17 +103,19 @@ class ExpenseService {
         for (var entry in expense.splits.entries) {
           String memberId = entry.key;
           double owedAmount = entry.value;
-          balances[memberId] = (balances[memberId] ?? 0) + owedAmount;
+          balances[memberId] = (balances[memberId] ?? 0) - owedAmount;
         }
 
-        balances[expense.payerId] = (balances[expense.payerId] ?? 0) - expense.amount;
+        balances[expense.payerId] = (balances[expense.payerId] ?? 0) + expense.amount;
       }
 
       // Process settlements
       for (var doc in settlementsSnapshot.docs) {
         Settlement settlement = Settlement.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-        balances[settlement.fromMemberId] = (balances[settlement.fromMemberId] ?? 0) - settlement.amount;
-        balances[settlement.toMemberId] = (balances[settlement.toMemberId] ?? 0) + settlement.amount;
+        // fromMemberId is paying (reducing their balance)
+        // toMemberId is receiving (reducing what they're owed)
+        balances[settlement.fromMemberId] = (balances[settlement.fromMemberId] ?? 0) + settlement.amount;
+        balances[settlement.toMemberId] = (balances[settlement.toMemberId] ?? 0) - settlement.amount;
       }
 
       return balances;
