@@ -149,7 +149,7 @@ class BalanceSheetScreen extends StatelessWidget {
                               return const SizedBox.shrink();
                             }
 
-                            final isOwing = balance > 0;
+                            final isOwing = balance < 0;
                             final badgeColor = isOwing
                                 ? Theme.of(context).colorScheme.errorContainer
                                 : Theme.of(

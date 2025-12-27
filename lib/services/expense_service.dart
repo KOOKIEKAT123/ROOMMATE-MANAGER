@@ -99,14 +99,14 @@ class ExpenseService {
       for (var doc in expensesSnapshot.docs) {
         Expense expense = Expense.fromMap(doc.data() as Map<String, dynamic>, doc.id);
 
-        // Each person's balance = what they owe - what they paid
+        // Each person's balance = what they paid - what they owe
         for (var entry in expense.splits.entries) {
           String memberId = entry.key;
           double owedAmount = entry.value;
-          balances[memberId] = (balances[memberId] ?? 0) - owedAmount;
+          balances[memberId] = (balances[memberId] ?? 0) + owedAmount;
         }
 
-        balances[expense.payerId] = (balances[expense.payerId] ?? 0) + expense.amount;
+        balances[expense.payerId] = (balances[expense.payerId] ?? 0) - expense.amount;
       }
 
       // Process settlements
